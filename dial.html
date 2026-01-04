@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vertical Gallery Dial</title>
+  <style>
+    :root{
+      --card: rgba(20,22,28,0.92);
+      --border: rgba(255,255,255,0.10);
+      --shadow: rgba(0,0,0,0.35);
+      --textMuted: rgba(255,255,255,0.65);
+      --radius: 18px;
+    }
+
+    html, body { height:100%; }
+    body{
+      margin:0;
+      background: transparent; /* blends into Notion */
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .wrap{
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    .frame{
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 14px 28px var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: var(--textMuted);
+      font-size: 14px;
+      user-select:none;
+    }
+
+    .content{
+      display:flex;
+      gap: 12px;
+      padding: 12px;
+      align-items: stretch;
+    }
+
+    /* ---------- Rabbit-style vertical dial ---------- */
+    .dialWrap{
+      width: 26px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position: relative;
+      padding: 2px 0;
+      flex: 0 0 26px;
+    }
+
+    /* subtle tick dots beside the dial */
+    .tickDots{
+      position:absolute;
+      right: -8px;
+      top: 10px;
+      bottom: 10px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      pointer-events:none;
+    }
+    .tickDots span{
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      transition: background 180ms ease;
+    }
+    .tickDots span.active{
+      background: rgba(255,255,255,0.55);
+    }
+
+    /* vertical dial input */
+    .dial{
+      -webkit-appearance: none;
+      appearance: none;
+
+      width: 200px;              /* becomes height after rotation */
+      height: 10px;              /* track thickness pre-rotate */
+      transform: rotate(-90deg); /* makes it vertical */
+      background: transparent;
+      outline: none;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    /* track */
+    .dial::-webkit-slider-runnable-track{
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    .dial::-moz-range-track{
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    /* thumb (sleek knob) */
+    .dial::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      border: 2px solid rgba(0,0,0,0.35);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
+      margin-top: -6px; /* centers thumb */
+    }
+    .dial::-moz-range-thumb{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      border: 2px solid rgba(0,0,0,0.35);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+
+    /* ---------- Gallery viewport ---------- */
+    .viewport{
+      flex: 1;
+      height: 170px;             /* widget height */
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      position: relative;
+    }
+
+    .track{
+      height: 100%;
+      transform: translateY(0);
+      transition: transform 1400ms cubic-bezier(.2,.9,.2,1);
+      will-change: transform;
+    }
+
+    .slide{
+      height: 170px;
+      width: 100%;
+      position: relative;
+    }
+
+    .slide img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.02);
+    }
+
+    .fade{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.10), rgba(0,0,0,0.18));
+    }
+
+    @media (max-width: 560px){
+      .viewport, .slide{ height: 190px; }
+      .dial{ width: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="frame" aria-label="Vertical gallery carousel with dial">
+      <div class="topbar">Gallery</div>
+
+      <div class="content">
+        <!-- Dial -->
+        <div class="dialWrap" aria-label="Gallery dial">
+          <input id="dial" class="dial" type="range" min="0" max="0" step="1" value="0" aria-label="Slide dial" />
+          <div class="tickDots" id="tickDots" aria-hidden="true"></div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="viewport" id="viewport">
+          <div class="track" id="track">
+
+            <!-- REPLACE THESE IMAGES with your own URLs or /images/... -->
+            <div class="slide"><img src="https://picsum.photos/id/1011/900/600" alt="Project image 1"></div>
+            <div class="slide"><img src="https://picsum.photos/id/1015/900/600" alt="Project image 2"></div>
+            <div class="slide"><img src="https://picsum.photos/id/1025/900/600" alt="Project image 3"></div>
+            <div class="slide"><img src="https://picsum.photos/id/1035/900/600" alt="Project image 4"></div>
+            <div class="slide"><img src="https://picsum.photos/id/1043/900/600" alt="Project image 5"></div>
+
+          </div>
+          <div class="fade"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const track = document.getElementById("track");
+      const slides = Array.from(track.querySelectorAll(".slide"));
+      const dial = document.getElementById("dial");
+      const tickDots = document.getElementById("tickDots");
+      const frame = document.querySelector(".frame");
+      const viewport = document.getElementById("viewport");
+
+      let index = 0;
+      let timer = null;
+      const AUTO_MS = 7000; // slower rotation
+      let isInteracting = false;
+
+      // Set dial range to match slide count
+      dial.max = String(slides.length - 1);
+      dial.value = "0";
+
+      // Build tick dots (subtle)
+      tickDots.innerHTML = "";
+      slides.forEach((_, i) => {
+        const s = document.createElement("span");
+        if (i === 0) s.classList.add("active");
+        tickDots.appendChild(s);
+      });
+      const dots = Array.from(tickDots.querySelectorAll("span"));
+
+      function setActive(i){
+        dots.forEach((d,k)=>d.classList.toggle("active", k===i));
+      }
+
+      function slideHeight(){
+        return slides[0].getBoundingClientRect().height;
+      }
+
+      function goTo(i, fromUser=false){
+        index = (i + slides.length) % slides.length;
+        track.style.transform = "translateY(" + (-index * slideHeight()) + "px)";
+        dial.value = String(index);
+        setActive(index);
+        if (fromUser) restartAutoSoon();
+      }
+
+      function startAuto(){
+        stopAuto();
+        timer = setInterval(() => {
+          if (!isInteracting) goTo(index + 1, false);
+        }, AUTO_MS);
+      }
+
+      function stopAuto(){
+        if (timer) clearInterval(timer);
+        timer = null;
+      }
+
+      function restartAutoSoon(){
+        stopAuto();
+        setTimeout(startAuto, 1200);
+      }
+
+      // Dial interaction
+      dial.addEventListener("input", () => {
+        isInteracting = true;
+        goTo(parseInt(dial.value, 10), true);
+      });
+
+      dial.addEventListener("pointerdown", () => {
+        isInteracting = true;
+        stopAuto();
+      });
+
+      window.addEventListener("pointerup", () => {
+        isInteracting = false;
+        startAuto();
+      });
+
+      // Wheel scroll changes slides
+      viewport.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        stopAuto();
+        const dir = e.deltaY > 0 ? 1 : -1;
+        goTo(index + dir, true);
+      }, { passive: false });
+
+      // Pause on hover
+      frame.addEventListener("mouseenter", stopAuto);
+      frame.addEventListener("mouseleave", startAuto);
+
+      // Keep correct on resize
+      window.addEventListener("resize", () => goTo(index, false));
+
+      // Init
+      goTo(0, false);
+      startAuto();
+    })();
+  </script>
+</body>
+</html>
