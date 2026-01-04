@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>References</title>
+
   <style>
     *{ box-sizing:border-box; }
 
@@ -18,28 +19,32 @@
       --shadow: rgba(0,0,0,0.35);
       --radius: 18px;
 
-      /* MATCH DIAL */
-      --totalH: 190px;    /* total card height */
-      --viewportH: 170px; /* content area height */
-      --headerH: 20px;    /* 190-170 */
+      /* MATCH QUICKVIEW DIAL */
+      --totalH: 190px;
+      --viewportH: 146px; /* reduced because header is taller */
+      --headerH: 44px;
     }
 
-    html, body { height:100%; }
+    html, body{
+      height:100%;
+    }
+
     body{
       margin:0;
       background: transparent;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color: var(--text);
-      overflow: hidden; /* prevents iframe scrollbar */
+      overflow: hidden; /* kills iframe scrollbar */
     }
 
     .wrap{
-      width: 100%;
+      width:100%;
       max-width: 920px;
       margin: 0 auto;
       padding: 12px;
     }
 
+    /* CARD */
     .slider{
       height: var(--totalH);
       border-radius: var(--radius);
@@ -49,22 +54,24 @@
       overflow: hidden;
     }
 
+    /* SPACIOUS HEADER */
     .topbar{
       height: var(--headerH);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding: 10px 12px;
+      padding: 0 20px;
       border-bottom: 1px solid var(--borderSoft);
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       user-select:none;
     }
 
     .controls{
       display:flex;
       gap: 8px;
-      align-items:center;
     }
 
     .btn{
@@ -74,25 +81,28 @@
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
       color: var(--text);
-      cursor: pointer;
+      cursor:pointer;
       font-size: 18px;
       line-height: 32px;
       transition: transform .12s ease, background .12s ease;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.07); }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.07);
+    }
 
+    /* VIEWPORT */
     .viewport{
       height: var(--viewportH);
       overflow: hidden;
       position: relative;
-      touch-action: pan-y;
     }
 
     .track{
       display:flex;
-      flex-wrap: nowrap;          /* critical */
-      width: 300%;                /* safety: ensures row width grows */
-      height: 100%;
+      flex-wrap: nowrap;
+      height:100%;
+      width:300%;
       transform: translateX(0%);
       transition: transform 420ms cubic-bezier(.2,.9,.2,1);
       will-change: transform;
@@ -100,9 +110,8 @@
 
     .slide{
       flex: 0 0 100%;
-      width: 100%;
-      height: 100%;
-      padding: 14px 16px 12px 16px;
+      height:100%;
+      padding: 14px 18px;
       display:flex;
       flex-direction:column;
       gap: 10px;
@@ -111,7 +120,7 @@
     .quote{
       font-size: 15px;
       line-height: 1.45;
-      max-height: 78px;
+      max-height: 72px;
       overflow: hidden;
     }
 
@@ -121,36 +130,50 @@
       flex-direction:column;
       gap: 2px;
     }
-    .name{ font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.82); }
-    .role{ font-size: 12px; color: var(--muted); }
 
+    .name{
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .role{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* DOTS */
     .dots{
       position:absolute;
-      left: 0;
-      right: 0;
+      left:0;
+      right:0;
       bottom: 10px;
       display:flex;
       justify-content:center;
       gap: 8px;
     }
 
-    .dotBtn{
+    .dot{
       width: 9px;
       height: 9px;
       border-radius: 999px;
-      border: 0;
+      border:0;
       background: var(--dot);
       cursor:pointer;
       transition: width 180ms ease, background 180ms ease;
     }
-    .dotBtn.active{
+
+    .dot.active{
       width: 24px;
       background: var(--dotActive);
     }
 
     @media (max-width: 560px){
-      :root{ --totalH: 210px; --viewportH: 190px; --headerH: 20px; }
-      .quote{ font-size: 14px; max-height: 92px; }
+      :root{
+        --totalH: 210px;
+        --viewportH: 166px;
+        --headerH: 44px;
+      }
     }
   </style>
 </head>
@@ -158,19 +181,24 @@
 <body>
   <div class="wrap">
     <div class="slider">
+
+      <!-- HEADER -->
       <div class="topbar">
         <div>References</div>
         <div class="controls">
-          <button class="btn" id="prev" aria-label="Previous">‹</button>
-          <button class="btn" id="next" aria-label="Next">›</button>
+          <button class="btn" id="prev">‹</button>
+          <button class="btn" id="next">›</button>
         </div>
       </div>
 
+      <!-- CONTENT -->
       <div class="viewport" id="viewport">
         <div class="track" id="track">
 
           <div class="slide">
-            <div class="quote">“Valmir is sharp and reliable — he communicates clearly and delivers clean work fast.”</div>
+            <div class="quote">
+              “Valmir is sharp and reliable — he communicates clearly and delivers clean work fast.”
+            </div>
             <div class="meta">
               <div class="name">Name Surname</div>
               <div class="role">Role / Company</div>
@@ -178,7 +206,9 @@
           </div>
 
           <div class="slide">
-            <div class="quote">“Strong CAD skills and great attention to detail. Easy to work with and always prepared.”</div>
+            <div class="quote">
+              “Strong CAD skills and great attention to detail. Easy to work with and always prepared.”
+            </div>
             <div class="meta">
               <div class="name">Name Surname</div>
               <div class="role">Role / Company</div>
@@ -186,7 +216,9 @@
           </div>
 
           <div class="slide">
-            <div class="quote">“He took initiative, asked the right questions, and improved the final outcome.”</div>
+            <div class="quote">
+              “He took initiative, asked the right questions, and improved the final outcome.”
+            </div>
             <div class="meta">
               <div class="name">Name Surname</div>
               <div class="role">Role / Company</div>
@@ -207,67 +239,47 @@
       const prev = document.getElementById("prev");
       const next = document.getElementById("next");
       const dotsWrap = document.getElementById("dots");
-      const viewport = document.getElementById("viewport");
 
       let index = 0;
       let timer = null;
       const AUTO_MS = 5200;
 
-      // Make track width match slide count (fixes stacking if you add slides)
       track.style.width = (slides.length * 100) + "%";
 
-      // Build dots
       slides.forEach((_, i) => {
-        const b = document.createElement("button");
-        b.className = "dotBtn" + (i === 0 ? " active" : "");
-        b.type = "button";
-        b.addEventListener("click", () => goTo(i, true));
-        dotsWrap.appendChild(b);
+        const d = document.createElement("button");
+        d.className = "dot" + (i === 0 ? " active" : "");
+        d.onclick = () => goTo(i, true);
+        dotsWrap.appendChild(d);
       });
-      const dots = Array.from(dotsWrap.children);
 
-      function setActive(i){
-        dots.forEach((d,k)=>d.classList.toggle("active", k===i));
-      }
+      const dots = Array.from(dotsWrap.children);
 
       function goTo(i, user){
         index = (i + slides.length) % slides.length;
-        track.style.transform = "translateX(" + (-index * (100 / slides.length)) + "%)";
-        setActive(index);
+        track.style.transform = `translateX(-${index * (100 / slides.length)}%)`;
+        dots.forEach((d,k)=>d.classList.toggle("active", k===index));
         if (user) restart();
       }
 
-      prev.addEventListener("click", () => goTo(index - 1, true));
-      next.addEventListener("click", () => goTo(index + 1, true));
+      prev.onclick = () => goTo(index - 1, true);
+      next.onclick = () => goTo(index + 1, true);
 
       function start(){
         stop();
-        timer = setInterval(() => goTo(index + 1, false), AUTO_MS);
+        timer = setInterval(()=>goTo(index + 1, false), AUTO_MS);
       }
+
       function stop(){
         if (timer) clearInterval(timer);
-        timer = null;
       }
-      function restart(){ start(); }
 
-      // pause on hover
-      viewport.addEventListener("mouseenter", stop);
-      viewport.addEventListener("mouseleave", start);
-
-      // swipe
-      let down=false, startX=0;
-      viewport.addEventListener("pointerdown", (e)=>{ down=true; startX=e.clientX; stop(); });
-      viewport.addEventListener("pointerup", (e)=>{
-        if(!down) return;
-        down=false;
-        const dx = e.clientX - startX;
-        if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1), true);
-        else start();
-      });
+      function restart(){
+        start();
+      }
 
       start();
     })();
   </script>
 </body>
 </html>
-
