@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reference Slider</title>
+  <style>
+    :root{
+      --bg: #0f1115;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.88);
+      --muted: rgba(255,255,255,0.65);
+      --dot: rgba(255,255,255,0.25);
+      --dotActive: rgba(255,255,255,0.78);
+      --shadow: rgba(0,0,0,0.30);
+    }
+    html, body { height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: transparent; /* so it blends in Notion */
+      color: var(--text);
+    }
+
+    .wrap{
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    .slider{
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 14px 28px var(--shadow);
+      overflow: hidden;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      gap: 10px;
+    }
+
+    .title{
+      font-size: 14px;
+      letter-spacing: .2px;
+      color: var(--muted);
+      user-select:none;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+
+    .btn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 34px;
+      transition: transform .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.07); }
+
+    .viewport{
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .track{
+      display:flex;
+      width: 100%;
+      transform: translateX(0);
+      transition: transform 420ms cubic-bezier(.2,.9,.2,1);
+    }
+
+    .slide{
+      flex: 0 0 100%;
+      padding: 16px 16px 14px 16px;
+      box-sizing: border-box;
+      min-height: 150px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .quote{
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .meta{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+    }
+    .name{
+      font-size: 13px;
+      color: rgba(255,255,255,0.80);
+      font-weight: 600;
+    }
+    .role{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 12px 12px;
+      gap: 8px;
+    }
+
+    .dot{
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      border: 0;
+      background: var(--dot);
+      cursor:pointer;
+      transition: width 180ms ease, background 180ms ease;
+    }
+    .dot.active{
+      width: 24px;
+      background: var(--dotActive);
+    }
+
+    /* Compact mode for small embeds */
+    @media (max-width: 520px){
+      .slide{ min-height: 170px; }
+      .quote{ font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="slider" aria-label="References slider">
+      <div class="topbar">
+        <div class="title">References</div>
+        <div class="controls">
+          <button class="btn" id="prev" aria-label="Previous">‹</button>
+          <button class="btn" id="next" aria-label="Next">›</button>
+        </div>
+      </div>
+
+      <div class="viewport" id="viewport">
+        <div class="track" id="track">
+
+          <!-- EDIT THESE SLIDES -->
+          <div class="slide">
+            <div class="quote">“Valmir is sharp and reliable — he communicates clearly and delivers clean work fast.”</div>
+            <div class="meta">
+              <div class="name">Name Surname</div>
+              <div class="role">Role / Company</div>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="quote">“Strong CAD skills and great attention to detail. Easy to work with and always prepared.”</div>
+            <div class="meta">
+              <div class="name">Name Surname</div>
+              <div class="role">Role / Company</div>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="quote">“He took initiative, asked the right questions, and improved the final outcome.”</div>
+            <div class="meta">
+              <div class="name">Name Surname</div>
+              <div class="role">Role / Company</div>
+            </div>
+          </div>
+          <!-- END EDIT -->
+
+        </div>
+      </div>
+
+      <div class="footer" id="dots" aria-label="Pagination dots"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const track = document.getElementById("track");
+      const slides = Array.from(track.children);
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+      const dotsWrap = document.getElementById("dots");
+      const viewport = document.getElementById("viewport");
+
+      let index = 0;
+      let timer = null;
+      const AUTO_MS = 3800;
+
+      // build dots
+      slides.forEach((_, i) => {
+        const b = document.createElement("button");
+        b.className = "dot" + (i === 0 ? " active" : "");
+        b.type = "button";
+        b.setAttribute("aria-label", "Go to slide " + (i + 1));
+        b.addEventListener("click", () => goTo(i, true));
+        dotsWrap.appendChild(b);
+      });
+      const dots = Array.from(dotsWrap.querySelectorAll(".dot"));
+
+      function setActiveDot(i){
+        dots.forEach((d, k) => d.classList.toggle("active", k === i));
+      }
+
+      function goTo(i, userAction){
+        index = (i + slides.length) % slides.length;
+        track.style.transform = "translateX(" + (-index * 100) + "%)";
+        setActiveDot(index);
+        if (userAction) restartAuto();
+      }
+
+      prev.addEventListener("click", () => goTo(index - 1, true));
+      next.addEventListener("click", () => goTo(index + 1, true));
+
+      // autoplay
+      function startAuto(){
+        stopAuto();
+        timer = setInterval(() => goTo(index + 1, false), AUTO_MS);
+      }
+      function stopAuto(){
+        if (timer) clearInterval(timer);
+        timer = null;
+      }
+      function restartAuto(){
+        startAuto();
+      }
+
+      // pause on hover (desktop)
+      viewport.addEventListener("mouseenter", stopAuto);
+      viewport.addEventListener("mouseleave", startAuto);
+
+      // swipe support
+      let down = false, startX = 0;
+      viewport.addEventListener("pointerdown", (e) => {
+        down = true;
+        startX = e.clientX;
+        stopAuto();
+      });
+      viewport.addEventListener("pointerup", (e) => {
+        if (!down) return;
+        down = false;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 45) {
+          goTo(index + (dx < 0 ? 1 : -1), true);
+        } else {
+          startAuto();
+        }
+      });
+
+      // start
+      startAuto();
+    })();
+  </script>
+</body>
+</html>
