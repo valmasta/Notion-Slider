@@ -72,14 +72,93 @@
       background: rgba(255,255,255,0.04);
       color: var(--text);
       cursor: pointer;
+      font-size: 18px;<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>References</title>
+  <style>
+    :root{
+      --card: rgba(20,22,28,0.92);
+      --border: rgba(255,255,255,0.10);
+      --borderSoft: rgba(255,255,255,0.07);
+      --text: rgba(255,255,255,0.88);
+      --muted: rgba(255,255,255,0.65);
+      --dot: rgba(255,255,255,0.25);
+      --dotActive: rgba(255,255,255,0.78);
+      --shadow: rgba(0,0,0,0.35);
+      --radius: 18px;
+
+      /* MATCH DIAL */
+      --totalH: 190px;   /* container height (like dial card) */
+      --viewportH: 170px;/* content height (like dial viewport) */
+    }
+
+    html, body { height:100%; }
+    body{
+      margin:0;
+      background: transparent; /* blends into Notion */
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+    }
+
+    .wrap{
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    /* OUTER CARD (same vibes as dial) */
+    .slider{
+      height: var(--totalH);
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 14px 28px var(--shadow);
+      overflow: hidden;
+    }
+
+    /* HEADER BAR */
+    .topbar{
+      height: calc(var(--totalH) - var(--viewportH)); /* 20px */
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      border-bottom: 1px solid var(--borderSoft);
+      color: var(--muted);
+      font-size: 14px;
+      user-select:none;
+    }
+
+    .controls{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+
+    .btn{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
       font-size: 18px;
-      line-height: 34px;
+      line-height: 32px;
       transition: transform .12s ease, background .12s ease;
       user-select:none;
     }
     .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.07); }
 
+    /* VIEWPORT (locked to dial height) */
     .viewport{
+      height: var(--viewportH);
       position: relative;
       overflow: hidden;
       touch-action: pan-y;
@@ -87,33 +166,38 @@
 
     .track{
       display:flex;
-      width: 100%;
+      height: 100%;
       transform: translateX(0);
       transition: transform 420ms cubic-bezier(.2,.9,.2,1);
+      will-change: transform;
     }
 
     .slide{
       flex: 0 0 100%;
-      padding: 16px 16px 14px 16px;
+      height: var(--viewportH);
+      padding: 14px 16px 12px 16px;
       box-sizing: border-box;
-      min-height: 150px;
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
-      gap: 12px;
+      gap: 10px;
     }
 
+    /* Keep quote from blowing up height */
     .quote{
       font-size: 15px;
       line-height: 1.45;
       color: var(--text);
+      max-height: 72px;
+      overflow: hidden;
     }
 
     .meta{
+      margin-top: auto; /* pins name/role to bottom */
       display:flex;
       flex-direction:column;
       gap: 2px;
     }
+
     .name{
       font-size: 13px;
       color: rgba(255,255,255,0.80);
@@ -124,12 +208,16 @@
       color: var(--muted);
     }
 
-    .footer{
+    /* Dots live INSIDE viewport at bottom like your screenshot */
+    .dots{
+      position:absolute;
+      left: 0;
+      right: 0;
+      bottom: 10px;
       display:flex;
-      align-items:center;
       justify-content:center;
-      padding: 10px 12px 12px;
       gap: 8px;
+      pointer-events: auto;
     }
 
     .dot{
@@ -146,10 +234,12 @@
       background: var(--dotActive);
     }
 
-    /* Compact mode for small embeds */
-    @media (max-width: 520px){
-      .slide{ min-height: 170px; }
-      .quote{ font-size: 14px; }
+    @media (max-width: 560px){
+      :root{
+        --totalH: 210px;
+        --viewportH: 190px;
+      }
+      .quote{ font-size: 14px; max-height: 86px; }
     }
   </style>
 </head>
@@ -157,7 +247,7 @@
   <div class="wrap">
     <div class="slider" aria-label="References slider">
       <div class="topbar">
-        <div class="title">References</div>
+        <div>References</div>
         <div class="controls">
           <button class="btn" id="prev" aria-label="Previous">‹</button>
           <button class="btn" id="next" aria-label="Next">›</button>
@@ -167,7 +257,7 @@
       <div class="viewport" id="viewport">
         <div class="track" id="track">
 
-          <!-- EDIT THESE SLIDES -->
+          <!-- SLIDE 1 -->
           <div class="slide">
             <div class="quote">“Valmir is sharp and reliable — he communicates clearly and delivers clean work fast.”</div>
             <div class="meta">
@@ -176,6 +266,7 @@
             </div>
           </div>
 
+          <!-- SLIDE 2 -->
           <div class="slide">
             <div class="quote">“Strong CAD skills and great attention to detail. Easy to work with and always prepared.”</div>
             <div class="meta">
@@ -184,6 +275,7 @@
             </div>
           </div>
 
+          <!-- SLIDE 3 -->
           <div class="slide">
             <div class="quote">“He took initiative, asked the right questions, and improved the final outcome.”</div>
             <div class="meta">
@@ -191,12 +283,11 @@
               <div class="role">Role / Company</div>
             </div>
           </div>
-          <!-- END EDIT -->
 
         </div>
-      </div>
 
-      <div class="footer" id="dots" aria-label="Pagination dots"></div>
+        <div class="dots" id="dots" aria-label="Pagination dots"></div>
+      </div>
     </div>
   </div>
 
@@ -204,42 +295,43 @@
     (function () {
       const track = document.getElementById("track");
       const slides = Array.from(track.children);
-      const prev = document.getElementById("prev");
-      const next = document.getElementById("next");
+      const prevBtn = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
       const dotsWrap = document.getElementById("dots");
       const viewport = document.getElementById("viewport");
 
       let index = 0;
       let timer = null;
-      const AUTO_MS = 3800;
+      const AUTO_MS = 5200;
+      let autoplay = true;
 
-      // build dots
+      // Build dots
       slides.forEach((_, i) => {
         const b = document.createElement("button");
         b.className = "dot" + (i === 0 ? " active" : "");
         b.type = "button";
-        b.setAttribute("aria-label", "Go to slide " + (i + 1));
         b.addEventListener("click", () => goTo(i, true));
         dotsWrap.appendChild(b);
       });
+
       const dots = Array.from(dotsWrap.querySelectorAll(".dot"));
 
       function setActiveDot(i){
-        dots.forEach((d, k) => d.classList.toggle("active", k === i));
+        dots.forEach((d,k)=>d.classList.toggle("active", k === i));
       }
 
-      function goTo(i, userAction){
+      function goTo(i, userAction=false){
         index = (i + slides.length) % slides.length;
         track.style.transform = "translateX(" + (-index * 100) + "%)";
         setActiveDot(index);
         if (userAction) restartAuto();
       }
 
-      prev.addEventListener("click", () => goTo(index - 1, true));
-      next.addEventListener("click", () => goTo(index + 1, true));
+      prevBtn.addEventListener("click", () => goTo(index - 1, true));
+      nextBtn.addEventListener("click", () => goTo(index + 1, true));
 
-      // autoplay
       function startAuto(){
+        if (!autoplay) return;
         stopAuto();
         timer = setInterval(() => goTo(index + 1, false), AUTO_MS);
       }
@@ -248,14 +340,15 @@
         timer = null;
       }
       function restartAuto(){
+        autoplay = true;
         startAuto();
       }
 
-      // pause on hover (desktop)
-      viewport.addEventListener("mouseenter", stopAuto);
-      viewport.addEventListener("mouseleave", startAuto);
+      // Pause on hover
+      viewport.addEventListener("mouseenter", () => { autoplay = false; stopAuto(); });
+      viewport.addEventListener("mouseleave", () => { autoplay = true; startAuto(); });
 
-      // swipe support
+      // Swipe
       let down = false, startX = 0;
       viewport.addEventListener("pointerdown", (e) => {
         down = true;
@@ -266,16 +359,13 @@
         if (!down) return;
         down = false;
         const dx = e.clientX - startX;
-        if (Math.abs(dx) > 45) {
-          goTo(index + (dx < 0 ? 1 : -1), true);
-        } else {
-          startAuto();
-        }
+        if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1), true);
+        else startAuto();
       });
 
-      // start
       startAuto();
     })();
   </script>
 </body>
 </html>
+
