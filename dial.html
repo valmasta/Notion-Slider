@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vertical Gallery Dial</title>
+  <title>QuickView Dial Gallery</title>
   <style>
     :root{
       --card: rgba(20,22,28,0.92);
       --border: rgba(255,255,255,0.10);
+      --borderSoft: rgba(255,255,255,0.07);
       --shadow: rgba(0,0,0,0.35);
       --textMuted: rgba(255,255,255,0.65);
+      --text: rgba(255,255,255,0.88);
       --radius: 18px;
     }
 
@@ -37,41 +39,76 @@
       position: relative;
     }
 
+    /* Top header for the whole widget */
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
       padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid var(--borderSoft);
       color: var(--textMuted);
       font-size: 14px;
       user-select:none;
     }
 
+    /* Main split layout: left rail + right content */
     .content{
       display:flex;
-      gap: 12px;
-      padding: 12px;
       align-items: stretch;
+      min-height: 190px;
     }
 
-    /* ---------- Rabbit-style vertical dial ---------- */
+    /* ---------- LEFT RAIL (QuickView + Dial) ---------- */
+    .rail{
+      width: 76px;                 /* rail width */
+      flex: 0 0 76px;
+      padding: 12px 10px;
+      box-sizing: border-box;
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* Vertical divider like Rabbit */
+    .rail::after{
+      content:"";
+      position:absolute;
+      top: 10px;
+      bottom: 10px;
+      right: 0;
+      width: 1px;
+      background: var(--borderSoft);
+    }
+
+    .railTitle{
+      width: 100%;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: .3px;
+      color: rgba(255,255,255,0.72);
+      font-weight: 600;
+      padding-left: 2px;
+      user-select:none;
+    }
+
     .dialWrap{
-      width: 26px;
+      width: 100%;
+      flex: 1;
       display:flex;
       align-items:center;
       justify-content:center;
       position: relative;
       padding: 2px 0;
-      flex: 0 0 26px;
     }
 
-    /* subtle tick dots beside the dial */
+    /* Subtle tick dots beside the dial */
     .tickDots{
       position:absolute;
-      right: -8px;
-      top: 10px;
-      bottom: 10px;
+      right: 6px;
+      top: 8px;
+      bottom: 8px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
@@ -81,28 +118,26 @@
       width: 4px;
       height: 4px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.16);
       transition: background 180ms ease;
     }
     .tickDots span.active{
       background: rgba(255,255,255,0.55);
     }
 
-    /* vertical dial input */
+    /* Vertical range (rotated) */
     .dial{
       -webkit-appearance: none;
       appearance: none;
-
-      width: 200px;              /* becomes height after rotation */
-      height: 10px;              /* track thickness pre-rotate */
-      transform: rotate(-90deg); /* makes it vertical */
+      width: 170px;               /* becomes vertical height after rotate */
+      height: 10px;
+      transform: rotate(-90deg);
       background: transparent;
       outline: none;
       cursor: pointer;
       touch-action: none;
     }
 
-    /* track */
     .dial::-webkit-slider-runnable-track{
       height: 8px;
       border-radius: 999px;
@@ -116,31 +151,39 @@
       border: 1px solid rgba(255,255,255,0.10);
     }
 
-    /* thumb (sleek knob) */
     .dial::-webkit-slider-thumb{
       -webkit-appearance: none;
       appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.88);
       border: 2px solid rgba(0,0,0,0.35);
       box-shadow: 0 10px 18px rgba(0,0,0,0.35);
-      margin-top: -6px; /* centers thumb */
+      margin-top: -6px;
     }
     .dial::-moz-range-thumb{
       width: 18px;
       height: 18px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.88);
       border: 2px solid rgba(0,0,0,0.35);
       box-shadow: 0 10px 18px rgba(0,0,0,0.35);
     }
 
-    /* ---------- Gallery viewport ---------- */
-    .viewport{
+    /* ---------- RIGHT SIDE (Gallery) ---------- */
+    .main{
       flex: 1;
-      height: 170px;             /* widget height */
+      padding: 12px;
+      box-sizing: border-box;
+      display:flex;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    .viewport{
+      width: 100%;
+      height: 170px;              /* widget height */
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.10);
@@ -173,40 +216,48 @@
       position:absolute;
       inset:0;
       pointer-events:none;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.10), rgba(0,0,0,0.18));
+      background: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(0,0,0,0.08), rgba(0,0,0,0.16));
     }
 
     @media (max-width: 560px){
       .viewport, .slide{ height: 190px; }
-      .dial{ width: 220px; }
+      .dial{ width: 190px; }
+      .content{ min-height: 210px; }
+      .rail{ width: 70px; flex-basis: 70px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="frame" aria-label="Vertical gallery carousel with dial">
+    <div class="frame" aria-label="QuickView gallery with dial">
       <div class="topbar">Gallery</div>
 
       <div class="content">
-        <!-- Dial -->
-        <div class="dialWrap" aria-label="Gallery dial">
-          <input id="dial" class="dial" type="range" min="0" max="0" step="1" value="0" aria-label="Slide dial" />
-          <div class="tickDots" id="tickDots" aria-hidden="true"></div>
+        <!-- LEFT: QuickView rail -->
+        <div class="rail" aria-label="QuickView controls">
+          <div class="railTitle">QuickView</div>
+
+          <div class="dialWrap">
+            <input id="dial" class="dial" type="range" min="0" max="0" step="1" value="0" aria-label="Slide dial" />
+            <div class="tickDots" id="tickDots" aria-hidden="true"></div>
+          </div>
         </div>
 
-        <!-- Gallery -->
-        <div class="viewport" id="viewport">
-          <div class="track" id="track">
+        <!-- RIGHT: Gallery viewport -->
+        <div class="main">
+          <div class="viewport" id="viewport">
+            <div class="track" id="track">
 
-            <!-- REPLACE THESE IMAGES with your own URLs or /images/... -->
-            <div class="slide"><img src="https://picsum.photos/id/1011/900/600" alt="Project image 1"></div>
-            <div class="slide"><img src="https://picsum.photos/id/1015/900/600" alt="Project image 2"></div>
-            <div class="slide"><img src="https://picsum.photos/id/1025/900/600" alt="Project image 3"></div>
-            <div class="slide"><img src="https://picsum.photos/id/1035/900/600" alt="Project image 4"></div>
-            <div class="slide"><img src="https://picsum.photos/id/1043/900/600" alt="Project image 5"></div>
+              <!-- REPLACE THESE IMAGES -->
+              <div class="slide"><img src="https://picsum.photos/id/1011/900/600" alt="Project image 1"></div>
+              <div class="slide"><img src="https://picsum.photos/id/1015/900/600" alt="Project image 2"></div>
+              <div class="slide"><img src="https://picsum.photos/id/1025/900/600" alt="Project image 3"></div>
+              <div class="slide"><img src="https://picsum.photos/id/1035/900/600" alt="Project image 4"></div>
+              <div class="slide"><img src="https://picsum.photos/id/1043/900/600" alt="Project image 5"></div>
 
+            </div>
+            <div class="fade"></div>
           </div>
-          <div class="fade"></div>
         </div>
       </div>
     </div>
@@ -223,14 +274,14 @@
 
       let index = 0;
       let timer = null;
-      const AUTO_MS = 7000; // slower rotation
+      const AUTO_MS = 7500; // slow rotation
       let isInteracting = false;
 
       // Set dial range to match slide count
       dial.max = String(slides.length - 1);
       dial.value = "0";
 
-      // Build tick dots (subtle)
+      // Build tick dots
       tickDots.innerHTML = "";
       slides.forEach((_, i) => {
         const s = document.createElement("span");
@@ -288,7 +339,7 @@
         startAuto();
       });
 
-      // Wheel scroll changes slides
+      // Wheel support (scroll to change slides)
       viewport.addEventListener("wheel", (e) => {
         e.preventDefault();
         stopAuto();
@@ -310,3 +361,4 @@
   </script>
 </body>
 </html>
+
